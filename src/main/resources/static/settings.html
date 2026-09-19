@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -139,7 +140,7 @@
             font-size: 14px;
         }
 
-        input[type="number"] {
+        input[type="text"] {
             width: 150px;
             padding: 11px;
             border: 1px solid #ddd;
@@ -170,15 +171,6 @@
             background: #5939df;
         }
 
-        .back-button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 10px;
-            background: #eee;
-            cursor: pointer;
-            font-size: 15px;
-        }
-
         .message {
             text-align: center;
             margin-top: 15px;
@@ -203,12 +195,13 @@
                 align-items: flex-start;
             }
 
-            input[type="number"],
+            input[type="text"],
             select {
                 width: 100%;
             }
         }
     </style>
+
 </head>
 
 <body>
@@ -232,7 +225,6 @@
 
     </header>
 
-
     <nav>
 
         <button onclick="goHome()">🏠 Home</button>
@@ -247,19 +239,15 @@
 
     </nav>
 
-
     <div class="container">
 
         <div class="page-title">
 
             <h1>⚙️ Settings</h1>
 
-            <p>
-                Customize your Expense Tracker
-            </p>
+            <p>Customize your Expense Tracker</p>
 
         </div>
-
 
         <!-- Budget Settings -->
 
@@ -279,12 +267,11 @@
 
                 </div>
 
-                <input type="number" id="budget" min="0" placeholder="₹5000">
+                <input type="text" id="budget" inputmode="decimal" placeholder="₹0">
 
             </div>
 
         </div>
-
 
         <!-- App Settings -->
 
@@ -318,7 +305,6 @@
 
             </div>
 
-
             <div class="setting-row">
 
                 <div class="setting-info">
@@ -345,7 +331,6 @@
 
         </div>
 
-
         <div class="settings-card">
 
             <button class="save-button" onclick="saveSettings()">
@@ -358,113 +343,104 @@
 
         </div>
 
-
-        <button class="back-button" onclick="goHome()">
-            ← Back to Home
-        </button>
-
     </div>
 
+    <script src="auth.js"></script>
 
     <script>
 
+        // Make sure a user is logged in
+        const loggedInUser = getLoggedInUser();
+
+        if (!loggedInUser) {
+            throw new Error("No user logged in");
+        }
+
+        // Each user's settings are stored separately
+        const budgetKey = "monthlyBudget_" + loggedInUser.id;
+        const currencyKey = "currency_" + loggedInUser.id;
+
+
+        // Load saved settings
+        function loadSettings() {
+
+            const savedBudget =
+                localStorage.getItem(budgetKey);
+
+            const savedCurrency =
+                localStorage.getItem(currencyKey);
+
+            // Show saved budget exactly as it was entered
+            document.getElementById("budget").value =
+                savedBudget !== null ? savedBudget : "0";
+
+            // Default currency is INR
+            document.getElementById("currency").value =
+                savedCurrency !== null ? savedCurrency : "₹";
+        }
+
+
+        // Save settings
+        function saveSettings() {
+
+            // Get the exact text entered by the user
+            const budgetInput =
+                document.getElementById("budget").value.trim();
+
+            const currency =
+                document.getElementById("currency").value;
+
+            // Save exactly what the user entered
+            const budget =
+                budgetInput === "" ? "0" : budgetInput;
+
+            localStorage.setItem(
+                budgetKey,
+                budget
+            );
+
+            localStorage.setItem(
+                currencyKey,
+                currency
+            );
+
+            // Show confirmation
+            const message =
+                document.getElementById("message");
+
+            message.style.display = "block";
+
+            setTimeout(function () {
+                message.style.display = "none";
+            }, 2500);
+        }
+
+
+        // Navigation
         function goHome() {
             window.location.href = "index.html";
         }
-
 
         function goAdd() {
             window.location.href = "add.html";
         }
 
-
         function goReports() {
             window.location.href = "reports.html";
         }
-
 
         function goExpenses() {
             window.location.href = "expenses.html";
         }
 
 
+        // Notification
         function showNotifications() {
-            alert("🔔 Notifications are working!");
+            alert("🔔 Notifications are enabled.");
         }
 
 
-        function saveSettings() {
-
-            const budget =
-                document.getElementById("budget").value;
-
-            const currency =
-                document.getElementById("currency").value;
-
-
-            if (budget) {
-
-                localStorage.setItem(
-                    "monthlyBudget",
-                    budget
-                );
-
-            }
-
-
-            localStorage.setItem(
-                "currency",
-                currency
-            );
-
-
-            const message =
-                document.getElementById("message");
-
-            message.style.display = "block";
-
-
-            setTimeout(() => {
-
-                message.style.display = "none";
-
-            }, 2500);
-
-        }
-
-
-        function loadSettings() {
-
-            const savedBudget =
-                localStorage.getItem("monthlyBudget");
-
-            const savedCurrency =
-                localStorage.getItem("currency");
-
-
-            if (savedBudget) {
-
-                document.getElementById("budget").value =
-                    savedBudget;
-
-            } else {
-
-                document.getElementById("budget").value =
-                    5000;
-
-            }
-
-
-            if (savedCurrency) {
-
-                document.getElementById("currency").value =
-                    savedCurrency;
-
-            }
-
-        }
-
-
+        // Load settings when page opens
         loadSettings();
 
     </script>

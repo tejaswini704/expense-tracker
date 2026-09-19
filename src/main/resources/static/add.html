@@ -281,8 +281,6 @@
                             🍔 Food
                         </option>
 
-                        <!-- NEW BILLS CATEGORY -->
-
                         <option value="Bills">
                             🧾 Bills
                         </option>
@@ -328,9 +326,17 @@
     </div>
 
 
+    <!-- Authentication JavaScript -->
+    <script src="auth.js"></script>
+
     <script>
 
         const API_URL = "/api/expenses";
+
+
+        // Check that a user is logged in
+
+        getLoggedInUser();
 
 
         // Set today's date automatically
@@ -380,9 +386,7 @@
 
                         method: "POST",
 
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
+                        headers: userHeaders(),
 
                         body: JSON.stringify({
 

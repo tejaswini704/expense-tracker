@@ -313,14 +313,39 @@
             <input type="text" id="searchInput" placeholder="🔍 Search expenses..." oninput="displayExpenses()">
 
             <select id="categoryFilter" onchange="displayExpenses()">
-                <option value="All">All Categories</option>
-                <option value="Food">Food</option>
-                <option value="Bills">Bills</option>
-                <option value="Travel">Travel</option>
-                <option value="Shopping">Shopping</option>
-                <option value="Skincare">Skincare</option>
-                <option value="Stationery">Stationery</option>
-                <option value="Other">Other</option>
+
+                <option value="All">
+                    All Categories
+                </option>
+
+                <option value="Food">
+                    Food
+                </option>
+
+                <option value="Bills">
+                    Bills
+                </option>
+
+                <option value="Travel">
+                    Travel
+                </option>
+
+                <option value="Shopping">
+                    Shopping
+                </option>
+
+                <option value="Skincare">
+                    Skincare
+                </option>
+
+                <option value="Stationery">
+                    Stationery
+                </option>
+
+                <option value="Other">
+                    Other
+                </option>
+
             </select>
 
             <input type="date" id="dateFilter" onchange="displayExpenses()">
@@ -334,7 +359,9 @@
 
             <p>Total of displayed expenses</p>
 
-            <h2 id="totalAmount">₹0.00</h2>
+            <h2 id="totalAmount">
+                ₹0.00
+            </h2>
 
         </div>
 
@@ -395,19 +422,33 @@
 
                 <select id="editCategory">
 
-                    <option value="Food">Food</option>
+                    <option value="Food">
+                        Food
+                    </option>
 
-                    <option value="Bills">Bills</option>
+                    <option value="Bills">
+                        Bills
+                    </option>
 
-                    <option value="Travel">Travel</option>
+                    <option value="Travel">
+                        Travel
+                    </option>
 
-                    <option value="Shopping">Shopping</option>
+                    <option value="Shopping">
+                        Shopping
+                    </option>
 
-                    <option value="Skincare">Skincare</option>
+                    <option value="Skincare">
+                        Skincare
+                    </option>
 
-                    <option value="Stationery">Stationery</option>
+                    <option value="Stationery">
+                        Stationery
+                    </option>
 
-                    <option value="Other">Other</option>
+                    <option value="Other">
+                        Other
+                    </option>
 
                 </select>
 
@@ -431,6 +472,11 @@
     </div>
 
 
+    <!-- AUTHENTICATION -->
+
+    <script src="auth.js"></script>
+
+
     <script>
 
         const API_URL = "/api/expenses";
@@ -440,6 +486,11 @@
         let editingExpenseId = null;
 
 
+        // CHECK LOGIN
+
+        getLoggedInUser();
+
+
         // LOAD EXPENSES
 
         async function loadExpenses() {
@@ -447,31 +498,44 @@
             try {
 
                 const response =
-                    await fetch(API_URL);
+                    await fetch(API_URL, {
+
+                        headers: userHeaders()
+
+                    });
+
 
                 if (!response.ok) {
+
                     throw new Error(
                         "Could not load expenses"
                     );
+
                 }
+
 
                 allExpenses =
                     await response.json();
 
+
                 console.log(
-                    "Expenses loaded:",
+                    "User expenses loaded:",
                     allExpenses
                 );
 
+
                 displayExpenses();
+
 
             } catch (error) {
 
                 console.error(error);
 
+
                 document.getElementById(
                     "expenseList"
                 ).innerHTML = `
+
                     <div class="empty">
 
                         <div class="empty-icon">
@@ -487,8 +551,11 @@
                         </p>
 
                     </div>
+
                 `;
+
             }
+
         }
 
 
@@ -590,6 +657,7 @@
             if (filteredExpenses.length === 0) {
 
                 list.innerHTML = `
+
                     <div class="empty">
 
                         <div class="empty-icon">
@@ -605,9 +673,11 @@
                         </p>
 
                     </div>
+
                 `;
 
                 return;
+
             }
 
 
@@ -644,6 +714,7 @@
 
 
                         return `
+
                             <div class="expense-card">
 
                                 <div class="expense-info">
@@ -691,8 +762,7 @@
                                         <button
                                             class="edit-btn"
                                             onclick="editExpense(${expense.id})"
-                                            title="Edit Expense"
-                                        >
+                                            title="Edit Expense">
                                             ✏️
                                         </button>
 
@@ -700,8 +770,7 @@
                                         <button
                                             class="delete-btn"
                                             onclick="deleteExpense(${expense.id})"
-                                            title="Delete Expense"
-                                        >
+                                            title="Delete Expense">
                                             🗑️
                                         </button>
 
@@ -710,6 +779,7 @@
                                 </div>
 
                             </div>
+
                         `;
 
                     })
@@ -762,13 +832,12 @@
                 );
 
                 return;
+
             }
 
 
             editingExpenseId = id;
 
-
-            // Fill form
 
             document.getElementById(
                 "editTitle"
@@ -800,8 +869,6 @@
                 category;
 
 
-            // Show modal
-
             document.getElementById(
                 "editModal"
             ).style.display =
@@ -817,6 +884,7 @@
             if (editingExpenseId === null) {
 
                 return;
+
             }
 
 
@@ -855,6 +923,7 @@
                 );
 
                 return;
+
             }
 
 
@@ -877,17 +946,16 @@
                     await fetch(
                         `${API_URL}/${editingExpenseId}`,
                         {
+
                             method: "PUT",
 
-                            headers: {
-                                "Content-Type":
-                                    "application/json"
-                            },
+                            headers: userHeaders(),
 
                             body:
                                 JSON.stringify(
                                     updatedExpense
                                 )
+
                         }
                     );
 
@@ -904,8 +972,6 @@
                 const updated =
                     await response.json();
 
-
-                // Update local list
 
                 const index =
                     allExpenses.findIndex(
@@ -936,6 +1002,7 @@
             } catch (error) {
 
                 console.error(error);
+
 
                 alert(
                     "Could not update the expense. Please make sure Spring Boot is running."
@@ -996,7 +1063,11 @@
                     await fetch(
                         `${API_URL}/${id}`,
                         {
-                            method: "DELETE"
+
+                            method: "DELETE",
+
+                            headers: userHeaders()
+
                         }
                     );
 
@@ -1028,6 +1099,7 @@
             } catch (error) {
 
                 console.error(error);
+
 
                 alert(
                     "Could not delete the expense. Please check that Spring Boot is running."

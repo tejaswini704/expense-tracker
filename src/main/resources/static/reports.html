@@ -8,6 +8,7 @@
     <title>Reports - Expense Tracker</title>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="auth.js"></script>
 
     <style>
         * {
@@ -440,6 +441,9 @@
 
         const API_URL = "/api/expenses";
 
+        // Make sure a user is logged in
+        getLoggedInUser();
+
         let allExpenses = [];
 
         let dailyChart = null;
@@ -465,13 +469,19 @@
 
             try {
 
-                const response = await fetch(API_URL);
+                const response = await fetch(API_URL, {
+
+                    headers: userHeaders()
+
+                });
+
 
                 if (!response.ok) {
 
                     throw new Error("Failed to load expenses");
 
                 }
+
 
                 allExpenses = await response.json();
 
@@ -676,7 +686,9 @@
                 const response =
                     await fetch(API_URL + "/" + id, {
 
-                        method: "DELETE"
+                        method: "DELETE",
+
+                        headers: userHeaders()
 
                     });
 

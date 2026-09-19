@@ -1,3 +1,4 @@
+
 package com.expensetracker.entity;
 
 import java.math.BigDecimal;
@@ -28,6 +29,10 @@ public class Expense {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Expense() {
     }
@@ -73,5 +78,13 @@ public class Expense {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
