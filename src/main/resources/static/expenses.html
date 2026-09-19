@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>All Expenses - Expense Tracker</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #333;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .title-section h1 {
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+
+        .title-section p {
+            color: #777;
+        }
+
+        .back-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            background: #333;
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .controls input,
+        .controls select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+        }
+
+        #searchInput {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .summary {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .summary p {
+            color: #777;
+            margin-bottom: 5px;
+        }
+
+        .summary h2 {
+            font-size: 28px;
+        }
+
+        .expense-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .expense-card {
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .expense-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .expense-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 25px;
+        }
+
+        .expense-details h3 {
+            margin-bottom: 5px;
+        }
+
+        .expense-details p {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .category {
+            display: inline-block;
+            padding: 4px 9px;
+            border-radius: 15px;
+            background: #eee;
+            font-size: 12px;
+        }
+
+        .right-section {
+            text-align: right;
+        }
+
+        .amount {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 7px;
+            justify-content: flex-end;
+        }
+
+        .actions button {
+            border: none;
+            padding: 7px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .edit-btn {
+            background: #e8f0ff;
+        }
+
+        .delete-btn {
+            background: #ffe5e5;
+        }
+
+        .empty {
+            background: white;
+            text-align: center;
+            padding: 50px;
+            border-radius: 12px;
+        }
+
+        .empty-icon {
+            font-size: 45px;
+            margin-bottom: 10px;
+        }
+
+        /* EDIT MODAL */
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .save-btn,
+        .cancel-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .save-btn {
+            background: #333;
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #eee;
+            color: #333;
+        }
+
+        @media (max-width: 600px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .header {
+                align-items: flex-start;
+            }
+
+            .expense-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .right-section {
+                width: 100%;
+                text-align: left;
+            }
+
+            .actions {
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+
+            <div class="title-section">
+                <h1>🧾 All Expenses</h1>
+                <p>View and manage all your expenses</p>
+            </div>
+
+            <button class="back-btn" onclick="goHome()">
+                ← Home
+            </button>
+
+        </div>
+
+
+        <!-- FILTERS -->
+
+        <div class="controls">
+
+            <input type="text" id="searchInput" placeholder="🔍 Search expenses..." oninput="displayExpenses()">
+
+            <select id="categoryFilter" onchange="displayExpenses()">
+                <option value="All">All Categories</option>
+                <option value="Food">Food</option>
+                <option value="Bills">Bills</option>
+                <option value="Travel">Travel</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Skincare">Skincare</option>
+                <option value="Stationery">Stationery</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <input type="date" id="dateFilter" onchange="displayExpenses()">
+
+        </div>
+
+
+        <!-- TOTAL -->
+
+        <div class="summary">
+
+            <p>Total of displayed expenses</p>
+
+            <h2 id="totalAmount">₹0.00</h2>
+
+        </div>
+
+
+        <!-- EXPENSE LIST -->
+
+        <div id="expenseList" class="expense-list"></div>
+
+    </div>
+
+
+    <!-- EDIT MODAL -->
+
+    <div id="editModal" class="modal">
+
+        <div class="modal-content">
+
+            <h2>✏️ Edit Expense</h2>
+
+            <div class="form-group">
+
+                <label for="editTitle">
+                    Title
+                </label>
+
+                <input type="text" id="editTitle" required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="editAmount">
+                    Amount
+                </label>
+
+                <input type="number" id="editAmount" step="0.01" min="0" required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="editDate">
+                    Date
+                </label>
+
+                <input type="date" id="editDate" required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="editCategory">
+                    Category
+                </label>
+
+                <select id="editCategory">
+
+                    <option value="Food">Food</option>
+
+                    <option value="Bills">Bills</option>
+
+                    <option value="Travel">Travel</option>
+
+                    <option value="Shopping">Shopping</option>
+
+                    <option value="Skincare">Skincare</option>
+
+                    <option value="Stationery">Stationery</option>
+
+                    <option value="Other">Other</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="modal-buttons">
+
+                <button class="cancel-btn" onclick="closeEditModal()">
+                    Cancel
+                </button>
+
+                <button class="save-btn" onclick="saveEdit()">
+                    Save Changes
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const API_URL = "/api/expenses";
+
+        let allExpenses = [];
+
+        let editingExpenseId = null;
+
+
+        // LOAD EXPENSES
+
+        async function loadExpenses() {
+
+            try {
+
+                const response =
+                    await fetch(API_URL);
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Could not load expenses"
+                    );
+                }
+
+                allExpenses =
+                    await response.json();
+
+                console.log(
+                    "Expenses loaded:",
+                    allExpenses
+                );
+
+                displayExpenses();
+
+            } catch (error) {
+
+                console.error(error);
+
+                document.getElementById(
+                    "expenseList"
+                ).innerHTML = `
+                    <div class="empty">
+
+                        <div class="empty-icon">
+                            ⚠️
+                        </div>
+
+                        <h3>
+                            Unable to load expenses
+                        </h3>
+
+                        <p>
+                            Please make sure Spring Boot is running.
+                        </p>
+
+                    </div>
+                `;
+            }
+        }
+
+
+        // DISPLAY EXPENSES
+
+        function displayExpenses() {
+
+            const searchText =
+                document.getElementById(
+                    "searchInput"
+                ).value
+                    .toLowerCase()
+                    .trim();
+
+
+            const selectedCategory =
+                document.getElementById(
+                    "categoryFilter"
+                ).value;
+
+
+            const selectedDate =
+                document.getElementById(
+                    "dateFilter"
+                ).value;
+
+
+            const filteredExpenses =
+                allExpenses.filter(expense => {
+
+                    const title =
+                        (expense.title || "")
+                            .toLowerCase();
+
+
+                    const category =
+                        expense.category?.name ||
+                        expense.category ||
+                        "Other";
+
+
+                    const expenseDate =
+                        expense.date || "";
+
+
+                    const matchesSearch =
+                        title.includes(searchText) ||
+                        category
+                            .toLowerCase()
+                            .includes(searchText);
+
+
+                    const matchesCategory =
+                        selectedCategory === "All" ||
+                        category === selectedCategory;
+
+
+                    const matchesDate =
+                        selectedDate === "" ||
+                        expenseDate === selectedDate;
+
+
+                    return (
+                        matchesSearch &&
+                        matchesCategory &&
+                        matchesDate
+                    );
+
+                });
+
+
+            // TOTAL
+
+            const total =
+                filteredExpenses.reduce(
+                    (sum, expense) =>
+                        sum +
+                        Number(
+                            expense.amount || 0
+                        ),
+                    0
+                );
+
+
+            document.getElementById(
+                "totalAmount"
+            ).textContent =
+                "₹" + total.toFixed(2);
+
+
+            const list =
+                document.getElementById(
+                    "expenseList"
+                );
+
+
+            // NO RESULTS
+
+            if (filteredExpenses.length === 0) {
+
+                list.innerHTML = `
+                    <div class="empty">
+
+                        <div class="empty-icon">
+                            🧾
+                        </div>
+
+                        <h3>
+                            No expenses found
+                        </h3>
+
+                        <p>
+                            Try another search, category or date.
+                        </p>
+
+                    </div>
+                `;
+
+                return;
+            }
+
+
+            // SORT BY DATE
+
+            const sortedExpenses =
+                [...filteredExpenses].sort(
+                    (a, b) =>
+                        new Date(
+                            b.date || 0
+                        ) -
+                        new Date(
+                            a.date || 0
+                        )
+                );
+
+
+            // CREATE CARDS
+
+            list.innerHTML =
+                sortedExpenses
+                    .map(expense => {
+
+                        const category =
+                            expense.category?.name ||
+                            expense.category ||
+                            "Other";
+
+
+                        const icon =
+                            getCategoryIcon(
+                                category
+                            );
+
+
+                        return `
+                            <div class="expense-card">
+
+                                <div class="expense-info">
+
+                                    <div class="expense-icon">
+                                        ${icon}
+                                    </div>
+
+                                    <div class="expense-details">
+
+                                        <h3>
+                                            ${escapeHtml(
+                            expense.title ||
+                            "Expense"
+                        )}
+                                        </h3>
+
+                                        <p>
+                                            📅 ${expense.date ||
+                            "No date"}
+                                        </p>
+
+                                        <span class="category">
+                                            ${escapeHtml(
+                                category
+                            )}
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="right-section">
+
+                                    <div class="amount">
+                                        ₹${Number(
+                                expense.amount || 0
+                            ).toFixed(2)}
+                                    </div>
+
+
+                                    <div class="actions">
+
+                                        <button
+                                            class="edit-btn"
+                                            onclick="editExpense(${expense.id})"
+                                            title="Edit Expense"
+                                        >
+                                            ✏️
+                                        </button>
+
+
+                                        <button
+                                            class="delete-btn"
+                                            onclick="deleteExpense(${expense.id})"
+                                            title="Delete Expense"
+                                        >
+                                            🗑️
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        `;
+
+                    })
+                    .join("");
+
+        }
+
+
+        // CATEGORY ICONS
+
+        function getCategoryIcon(category) {
+
+            const icons = {
+
+                Food: "🍔",
+
+                Bills: "🧾",
+
+                Travel: "🚗",
+
+                Shopping: "🛍️",
+
+                Skincare: "🧴",
+
+                Stationery: "📚",
+
+                Other: "💰"
+
+            };
+
+            return icons[category] || "💰";
+
+        }
+
+
+        // EDIT EXPENSE
+
+        function editExpense(id) {
+
+            const expense =
+                allExpenses.find(
+                    item => item.id === id
+                );
+
+
+            if (!expense) {
+
+                alert(
+                    "Expense not found."
+                );
+
+                return;
+            }
+
+
+            editingExpenseId = id;
+
+
+            // Fill form
+
+            document.getElementById(
+                "editTitle"
+            ).value =
+                expense.title || "";
+
+
+            document.getElementById(
+                "editAmount"
+            ).value =
+                expense.amount || "";
+
+
+            document.getElementById(
+                "editDate"
+            ).value =
+                expense.date || "";
+
+
+            const category =
+                expense.category?.name ||
+                expense.category ||
+                "Other";
+
+
+            document.getElementById(
+                "editCategory"
+            ).value =
+                category;
+
+
+            // Show modal
+
+            document.getElementById(
+                "editModal"
+            ).style.display =
+                "flex";
+
+        }
+
+
+        // SAVE EDIT
+
+        async function saveEdit() {
+
+            if (editingExpenseId === null) {
+
+                return;
+            }
+
+
+            const title =
+                document.getElementById(
+                    "editTitle"
+                ).value.trim();
+
+
+            const amount =
+                document.getElementById(
+                    "editAmount"
+                ).value;
+
+
+            const date =
+                document.getElementById(
+                    "editDate"
+                ).value;
+
+
+            const category =
+                document.getElementById(
+                    "editCategory"
+                ).value;
+
+
+            if (
+                title === "" ||
+                amount === "" ||
+                date === ""
+            ) {
+
+                alert(
+                    "Please fill all fields."
+                );
+
+                return;
+            }
+
+
+            const updatedExpense = {
+
+                title: title,
+
+                amount: Number(amount),
+
+                date: date,
+
+                category: category
+
+            };
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_URL}/${editingExpenseId}`,
+                        {
+                            method: "PUT",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify(
+                                    updatedExpense
+                                )
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Update failed"
+                    );
+
+                }
+
+
+                const updated =
+                    await response.json();
+
+
+                // Update local list
+
+                const index =
+                    allExpenses.findIndex(
+                        item =>
+                            item.id ===
+                            editingExpenseId
+                    );
+
+
+                if (index !== -1) {
+
+                    allExpenses[index] =
+                        updated;
+
+                }
+
+
+                closeEditModal();
+
+                displayExpenses();
+
+
+                alert(
+                    "Expense updated successfully! ✏️"
+                );
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    "Could not update the expense. Please make sure Spring Boot is running."
+                );
+
+            }
+
+        }
+
+
+        // CLOSE EDIT MODAL
+
+        function closeEditModal() {
+
+            document.getElementById(
+                "editModal"
+            ).style.display =
+                "none";
+
+            editingExpenseId = null;
+
+        }
+
+
+        // DELETE EXPENSE
+
+        async function deleteExpense(id) {
+
+            const expense =
+                allExpenses.find(
+                    item => item.id === id
+                );
+
+
+            if (!expense) {
+
+                return;
+
+            }
+
+
+            const confirmed =
+                confirm(
+                    `Are you sure you want to delete "${expense.title}"?`
+                );
+
+
+            if (!confirmed) {
+
+                return;
+
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_URL}/${id}`,
+                        {
+                            method: "DELETE"
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Delete failed"
+                    );
+
+                }
+
+
+                allExpenses =
+                    allExpenses.filter(
+                        item =>
+                            item.id !== id
+                    );
+
+
+                displayExpenses();
+
+
+                alert(
+                    "Expense deleted successfully! 🗑️"
+                );
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    "Could not delete the expense. Please check that Spring Boot is running."
+                );
+
+            }
+
+        }
+
+
+        // HOME
+
+        function goHome() {
+
+            window.location.href = "/";
+
+        }
+
+
+        // ESCAPE HTML
+
+        function escapeHtml(text) {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.textContent = text;
+
+            return div.innerHTML;
+
+        }
+
+
+        // START
+
+        loadExpenses();
+
+    </script>
+
+</body>
+
+</html>

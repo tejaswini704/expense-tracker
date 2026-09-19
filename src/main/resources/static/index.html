@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Expense Tracker</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #39334a;
+            min-height: 100vh;
+
+            background:
+                radial-gradient(circle at 10% 10%, #eadfff 0, transparent 30%),
+                radial-gradient(circle at 90% 15%, #ffe0d2 0, transparent 28%),
+                radial-gradient(circle at 80% 90%, #f9ddeb 0, transparent 30%),
+                #faf8ff;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1150px;
+            margin: 25px auto 90px;
+        }
+
+        /* HEADER */
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 15px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-size: 24px;
+
+            background: linear-gradient(135deg, #9b7be8, #e8a6bd);
+            box-shadow: 0 8px 20px rgba(145, 111, 205, 0.2);
+        }
+
+        .brand h2 {
+            margin: 0;
+            font-size: 22px;
+            color: #51466c;
+        }
+
+        .brand p {
+            margin: 3px 0 0;
+            font-size: 13px;
+            color: #8b8398;
+        }
+
+        .notification {
+            width: 45px;
+            height: 45px;
+            border-radius: 14px;
+
+            border: 1px solid #eee7f5;
+            background: rgba(255, 255, 255, 0.85);
+
+            cursor: pointer;
+            font-size: 19px;
+
+            box-shadow: 0 5px 15px rgba(100, 80, 130, 0.07);
+        }
+
+        .notification:hover {
+            background: #eee6ff;
+        }
+
+        /* NAVIGATION */
+
+        .nav {
+            display: flex;
+            gap: 8px;
+
+            background: rgba(255, 255, 255, 0.82);
+            padding: 8px;
+
+            border-radius: 18px;
+            margin-bottom: 28px;
+
+            box-shadow: 0 8px 25px rgba(100, 80, 130, 0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav button {
+            flex: 1;
+
+            border: none;
+            background: transparent;
+
+            padding: 12px 8px;
+            border-radius: 13px;
+
+            font-size: 14px;
+            color: #777083;
+
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav button:hover,
+        .nav button.active {
+            background: #eee6ff;
+            color: #7656c7;
+            font-weight: 600;
+        }
+
+        /* PAGE HEADING */
+
+        .page-heading {
+            margin-bottom: 20px;
+        }
+
+        .page-heading h1 {
+            margin: 0;
+            font-size: 30px;
+            color: #443b59;
+        }
+
+        .page-heading p {
+            margin: 6px 0 0;
+            color: #8b8398;
+        }
+
+        /* TOTAL CARD */
+
+        .total-card {
+            position: relative;
+            overflow: hidden;
+
+            background: linear-gradient(135deg, #9879df, #c697e8);
+            color: white;
+
+            padding: 28px;
+            border-radius: 25px;
+
+            margin-bottom: 20px;
+
+            box-shadow: 0 14px 30px rgba(135, 99, 200, 0.22);
+        }
+
+        .total-card::after {
+            content: "";
+            position: absolute;
+
+            width: 180px;
+            height: 180px;
+
+            border-radius: 50%;
+
+            background: rgba(255, 255, 255, 0.12);
+
+            right: -50px;
+            top: -60px;
+        }
+
+        .total-card p {
+            margin: 0 0 8px;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .total-card h2 {
+            margin: 0;
+            font-size: 38px;
+        }
+
+        .total-card small {
+            display: block;
+            margin-top: 10px;
+            opacity: 0.85;
+        }
+
+        /* SUMMARY */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 17px;
+            margin-bottom: 22px;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+
+            border-radius: 20px;
+
+            box-shadow: 0 7px 24px rgba(100, 80, 130, 0.08);
+
+            transition: 0.2s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .summary-icon {
+            font-size: 25px;
+        }
+
+        .summary-card p {
+            margin: 9px 0 4px;
+            color: #8a8295;
+            font-size: 13px;
+        }
+
+        .summary-card h3 {
+            margin: 0;
+            font-size: 21px;
+            color: #4b425d;
+        }
+
+        /* MAIN GRID */
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.92);
+            padding: 22px;
+            border-radius: 22px;
+
+            box-shadow: 0 7px 25px rgba(100, 80, 130, 0.08);
+        }
+
+        .section h2 {
+            margin: 0 0 18px;
+            font-size: 19px;
+            color: #4b425d;
+        }
+
+        /* CHART */
+
+        .chart-box {
+            height: 320px;
+            position: relative;
+        }
+
+        /* CATEGORIES */
+
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 14px 8px;
+
+            border-bottom: 1px solid #eee9f3;
+        }
+
+        .category-item:last-child {
+            border-bottom: none;
+        }
+
+        .category-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-icon {
+            width: 34px;
+            height: 34px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background: #f5f0ff;
+            border-radius: 10px;
+        }
+
+        .category-amount {
+            font-weight: 600;
+            color: #66568a;
+        }
+
+        /* RECENT EXPENSES */
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 14px 7px;
+
+            border-bottom: 1px solid #eee9f3;
+        }
+
+        .expense-item:last-child {
+            border-bottom: none;
+        }
+
+        .expense-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .expense-icon {
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 13px;
+            background: #fff1ec;
+
+            font-size: 19px;
+        }
+
+        .expense-title {
+            font-weight: 600;
+            color: #4b425d;
+        }
+
+        .expense-date {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #9991a2;
+        }
+
+        .expense-amount {
+            font-weight: 700;
+            color: #7656c7;
+        }
+
+        /* MONEY SNAPSHOT */
+
+        .snapshot {
+            background: linear-gradient(135deg, #fff8fc, #f4efff);
+            padding: 22px;
+            border-radius: 22px;
+            margin-top: 20px;
+            box-shadow: 0 7px 25px rgba(100, 80, 130, 0.08);
+        }
+
+        .snapshot h2 {
+            margin: 0 0 10px;
+            color: #4b425d;
+            font-size: 19px;
+        }
+
+        .snapshot p {
+            margin: 0;
+            color: #777083;
+            line-height: 1.6;
+        }
+
+        /* QUICK ACTIONS */
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .quick-button {
+            border: none;
+            padding: 16px;
+            border-radius: 15px;
+            background: white;
+            color: #66568a;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 7px 20px rgba(100, 80, 130, 0.08);
+        }
+
+        .quick-button:hover {
+            background: #eee6ff;
+            transform: translateY(-2px);
+        }
+
+        /* FLOATING BUTTON */
+
+        .floating-button {
+            position: fixed;
+
+            right: 28px;
+            bottom: 25px;
+
+            width: 62px;
+            height: 62px;
+
+            border: none;
+            border-radius: 50%;
+
+            background: linear-gradient(135deg, #9271dd, #dfa0ba);
+
+            color: white;
+
+            font-size: 30px;
+
+            cursor: pointer;
+
+            box-shadow: 0 10px 25px rgba(125, 88, 190, 0.3);
+        }
+
+        .floating-button:hover {
+            transform: scale(1.08);
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 800px) {
+
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                width: 94%;
+                margin-top: 18px;
+            }
+
+            .nav button {
+                font-size: 11px;
+                padding: 10px 3px;
+            }
+
+            .nav {
+                gap: 3px;
+            }
+
+            .page-heading h1 {
+                font-size: 25px;
+            }
+
+            .total-card h2 {
+                font-size: 32px;
+            }
+
+            .floating-button {
+                right: 20px;
+                bottom: 20px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- HEADER -->
+
+        <div class="header">
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    💰
+                </div>
+
+                <div>
+                    <h2>Expense Tracker</h2>
+                    <p>Manage your money smartly</p>
+                </div>
+
+            </div>
+
+
+            <!-- WORKING BELL -->
+
+            <button class="notification" onclick="showNotifications()">
+                🔔
+            </button>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+
+        <div class="nav">
+
+            <button class="active" onclick="goHome()">
+                🏠 Home
+            </button>
+
+            <button onclick="goAdd()">
+                ➕ Add
+            </button>
+
+            <button onclick="goReports()">
+                📊 Reports
+            </button>
+
+            <button onclick="goExpenses()">
+                🧾 Expenses
+            </button>
+
+            <button onclick="goSettings()">
+                ⚙️ Settings
+            </button>
+
+        </div>
+
+
+        <!-- DASHBOARD -->
+
+        <div id="dashboard">
+
+            <div class="page-heading">
+
+                <h1>Good morning, Teju 👋</h1>
+
+                <p>Here's your spending overview</p>
+
+            </div>
+
+
+            <!-- TOTAL -->
+
+            <div class="total-card">
+
+                <p>Total Spent</p>
+
+                <h2 id="totalSpent">
+                    ₹0
+                </h2>
+
+                <small>
+                    September 2026 • Keep tracking your spending 💜
+                </small>
+
+            </div>
+
+
+            <!-- SUMMARY CARDS -->
+
+            <div class="summary-grid">
+
+                <div class="summary-card">
+
+                    <div class="summary-icon">
+                        🎯
+                    </div>
+
+                    <p>Monthly Budget</p>
+
+                    <h3 id="budget">
+                        ₹5,000
+                    </h3>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-icon">
+                        💵
+                    </div>
+
+                    <p>Remaining</p>
+
+                    <h3 id="remaining">
+                        ₹5,000
+                    </h3>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-icon">
+                        🏆
+                    </div>
+
+                    <p>Top Category</p>
+
+                    <h3 id="topCategory">
+                        -
+                    </h3>
+
+                </div>
+
+            </div>
+
+
+            <!-- CHART + CATEGORY -->
+
+            <div class="main-grid">
+
+                <div class="section">
+
+                    <h2>
+                        📊 Spending Overview
+                    </h2>
+
+                    <div class="chart-box">
+
+                        <canvas id="expenseChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+                <div class="section">
+
+                    <h2>
+                        🏷️ Category Spending
+                    </h2>
+
+                    <div id="categoryList"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- RECENT EXPENSES -->
+
+            <div class="section">
+
+                <h2>
+                    🧾 Recent Expenses
+                </h2>
+
+                <div id="recentExpenses"></div>
+
+            </div>
+
+
+            <!-- MONEY SNAPSHOT -->
+
+            <div class="snapshot">
+
+                <h2>💡 Money Snapshot</h2>
+
+                <p id="snapshotText">
+                    Start tracking your expenses to see your spending insights here.
+                </p>
+
+            </div>
+
+
+            <!-- QUICK ACTIONS -->
+
+            <div class="quick-actions">
+
+                <button class="quick-button" onclick="goAdd()">
+                    ➕ Add Expense
+                </button>
+
+                <button class="quick-button" onclick="goExpenses()">
+                    🧾 View All Expenses
+                </button>
+
+                <button class="quick-button" onclick="goReports()">
+                    📊 View Reports
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FLOATING ADD BUTTON -->
+
+    <button class="floating-button" onclick="goAdd()">
+        +
+    </button>
+
+
+    <script>
+
+        const API_URL = "/api/expenses";
+
+        let expenseChart = null;
+
+
+        /*
+         * SETTINGS
+         *
+         * Read Monthly Budget and Currency
+         * saved from settings.html
+         */
+
+        const monthlyBudget =
+            Number(localStorage.getItem("monthlyBudget")) || 5000;
+
+        const currency =
+            localStorage.getItem("currency") || "₹";
+
+
+        /*
+         * NAVIGATION
+         */
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+
+        function goAdd() {
+            window.location.href = "add.html";
+        }
+
+        function goReports() {
+            window.location.href = "reports.html";
+        }
+
+        function goExpenses() {
+            window.location.href = "expenses.html";
+        }
+
+        function goSettings() {
+            window.location.href = "settings.html";
+        }
+
+
+        /*
+         * NOTIFICATIONS
+         */
+
+        function showNotifications() {
+
+            fetch(API_URL)
+
+                .then(response => response.json())
+
+                .then(expenses => {
+
+                    let total = 0;
+
+                    expenses.forEach(expense => {
+                        total += Number(expense.amount) || 0;
+                    });
+
+                    const remaining =
+                        monthlyBudget - total;
+
+
+                    if (expenses.length === 0) {
+
+                        alert(
+                            "🔔 Notifications\n\n" +
+                            "You don't have any expenses yet. Start tracking your spending! 💜"
+                        );
+
+                    } else if (remaining < 0) {
+
+                        alert(
+                            "🔔 Budget Alert!\n\n" +
+                            "You have exceeded your " +
+                            currency +
+                            Number(monthlyBudget).toLocaleString("en-IN") +
+                            " monthly budget by " +
+                            currency +
+                            Math.abs(remaining).toFixed(2) +
+                            "."
+                        );
+
+                    } else if (remaining < 1000) {
+
+                        alert(
+                            "🔔 Budget Alert!\n\n" +
+                            "Only " +
+                            currency +
+                            remaining.toFixed(2) +
+                            " is remaining from your " +
+                            currency +
+                            Number(monthlyBudget).toLocaleString("en-IN") +
+                            " budget."
+                        );
+
+                    } else {
+
+                        alert(
+                            "🔔 Money Update\n\n" +
+                            "Total spent: " +
+                            currency +
+                            total.toFixed(2) +
+                            "\nRemaining budget: " +
+                            currency +
+                            remaining.toFixed(2) +
+                            "\n\nKeep tracking your expenses! 💜"
+                        );
+
+                    }
+
+                })
+
+                .catch(error => {
+
+                    console.error(error);
+
+                    alert(
+                        "🔔 Notifications\n\n" +
+                        "Unable to load your spending information."
+                    );
+
+                });
+        }
+
+
+        /*
+         * LOAD EXPENSES
+         */
+
+        function loadExpenses() {
+
+            fetch(API_URL)
+
+                .then(response => {
+
+                    if (!response.ok) {
+                        throw new Error("Failed to load expenses");
+                    }
+
+                    return response.json();
+
+                })
+
+                .then(expenses => {
+
+                    let total = 0;
+
+
+                    /* BILLS ADDED HERE */
+
+                    const categories = {
+                        Food: 0,
+                        Bills: 0,
+                        Travel: 0,
+                        Shopping: 0,
+                        Skincare: 0,
+                        Stationery: 0,
+                        Other: 0
+                    };
+
+
+                    expenses.forEach(expense => {
+
+                        const amount =
+                            Number(expense.amount) || 0;
+
+                        total += amount;
+
+                        const category =
+                            expense.category?.name || "Other";
+
+                        if (categories[category] !== undefined) {
+                            categories[category] += amount;
+                        }
+
+                    });
+
+
+                    /*
+                     * BUDGET
+                     */
+
+                    document.getElementById("budget").innerText =
+                        currency +
+                        Number(monthlyBudget).toLocaleString("en-IN");
+
+
+                    /*
+                     * TOTAL
+                     */
+
+                    document.getElementById("totalSpent").innerText =
+                        currency +
+                        total.toFixed(2);
+
+
+                    /*
+                     * REMAINING
+                     */
+
+                    const remaining =
+                        monthlyBudget - total;
+
+                    document.getElementById("remaining").innerText =
+                        currency +
+                        Math.max(remaining, 0).toFixed(2);
+
+
+                    /*
+                     * TOP CATEGORY
+                     */
+
+                    let topCategory = "-";
+                    let highest = 0;
+
+                    for (const category in categories) {
+
+                        if (categories[category] > highest) {
+
+                            highest = categories[category];
+
+                            topCategory = category;
+
+                        }
+
+                    }
+
+                    document.getElementById("topCategory").innerText =
+                        topCategory;
+
+
+                    /*
+                     * MONEY SNAPSHOT
+                     */
+
+                    let snapshotText = "";
+
+                    if (total === 0) {
+
+                        snapshotText =
+                            "You haven't added any expenses yet. Start recording your spending to understand where your money goes. 💜";
+
+                    } else if (remaining < 0) {
+
+                        snapshotText =
+                            "You have spent " +
+                            currency +
+                            total.toFixed(2) +
+                            " this month and crossed your " +
+                            currency +
+                            Number(monthlyBudget).toLocaleString("en-IN") +
+                            " budget. Review your spending categories to see where you can adjust.";
+
+                    } else {
+
+                        snapshotText =
+                            "You've spent " +
+                            currency +
+                            total.toFixed(2) +
+                            " this month and have " +
+                            currency +
+                            remaining.toFixed(2) +
+                            " remaining from your " +
+                            currency +
+                            Number(monthlyBudget).toLocaleString("en-IN") +
+                            " budget. Your highest spending category is " +
+                            topCategory +
+                            ".";
+
+                    }
+
+                    document.getElementById("snapshotText").innerText =
+                        snapshotText;
+
+
+                    /*
+                     * CATEGORY ICONS
+                     */
+
+                    const icons = {
+
+                        Food: "🍔",
+                        Bills: "🧾",
+                        Travel: "🚕",
+                        Shopping: "🛍️",
+                        Skincare: "🧴",
+                        Stationery: "📚",
+                        Other: "📦"
+
+                    };
+
+
+                    /*
+                     * CATEGORY LIST
+                     */
+
+                    const categoryList =
+                        document.getElementById("categoryList");
+
+                    categoryList.innerHTML = "";
+
+                    for (const category in categories) {
+
+                        categoryList.innerHTML += `
+
+                            <div class="category-item">
+
+                                <div class="category-name">
+
+                                    <div class="category-icon">
+                                        ${icons[category]}
+                                    </div>
+
+                                    <span>
+                                        ${category}
+                                    </span>
+
+                                </div>
+
+                                <div class="category-amount">
+                                    ${currency}${categories[category].toFixed(2)}
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }
+
+
+                    /*
+                     * RECENT EXPENSES
+                     */
+
+                    const recentExpenses =
+                        document.getElementById("recentExpenses");
+
+                    recentExpenses.innerHTML = "";
+
+                    const latestExpenses =
+                        [...expenses]
+                            .reverse()
+                            .slice(0, 5);
+
+
+                    if (latestExpenses.length === 0) {
+
+                        recentExpenses.innerHTML = `
+
+                            <p style="text-align:center;color:#9991a2;">
+                                No expenses yet.
+                            </p>
+
+                        `;
+
+                    }
+
+
+                    latestExpenses.forEach(expense => {
+
+                        const amount =
+                            Number(expense.amount) || 0;
+
+                        const category =
+                            expense.category?.name || "Other";
+
+
+                        recentExpenses.innerHTML += `
+
+                            <div class="expense-item">
+
+                                <div class="expense-left">
+
+                                    <div class="expense-icon">
+                                        ${icons[category] || "📦"}
+                                    </div>
+
+                                    <div>
+
+                                        <div class="expense-title">
+                                            ${expense.title ?? ""}
+                                        </div>
+
+                                        <div class="expense-date">
+                                            ${category} • ${expense.date ?? ""}
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="expense-amount">
+                                    ${currency}${amount.toFixed(2)}
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    });
+
+
+                    /*
+                     * CHART
+                     */
+
+                    updateChart(categories);
+
+                })
+
+                .catch(error => {
+
+                    console.error(
+                        "Error loading expenses:",
+                        error
+                    );
+
+                });
+
+        }
+
+
+        /*
+         * UPDATE CHART
+         */
+
+        function updateChart(categories) {
+
+            const ctx =
+                document.getElementById("expenseChart");
+
+            if (expenseChart !== null) {
+                expenseChart.destroy();
+            }
+
+            expenseChart = new Chart(
+                ctx,
+                {
+
+                    type: "doughnut",
+
+                    data: {
+
+                        labels: Object.keys(categories),
+
+                        datasets: [{
+
+                            data: Object.values(categories),
+
+                            borderWidth: 2
+
+                        }]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        cutout: "58%",
+
+                        plugins: {
+
+                            legend: {
+
+                                position: "bottom",
+
+                                labels: {
+                                    padding: 15
+                                }
+
+                            },
+
+                            tooltip: {
+
+                                callbacks: {
+
+                                    label: function (context) {
+
+                                        return (
+                                            context.label +
+                                            ": " +
+                                            currency +
+                                            Number(context.raw).toFixed(2)
+                                        );
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /*
+         * START
+         */
+
+        loadExpenses();
+
+    </script>
+
+</body>
+
+</html>

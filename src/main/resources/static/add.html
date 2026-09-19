@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Expense - Expense Tracker</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f6fa;
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        header h1 {
+            font-size: 25px;
+        }
+
+        header p {
+            color: #777;
+            margin-top: 5px;
+        }
+
+        .bell {
+            border: none;
+            background: #f1f3f6;
+            font-size: 22px;
+            padding: 10px 14px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        nav button {
+            border: none;
+            background: transparent;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        nav button:hover {
+            background: #f0f2f5;
+        }
+
+        .active {
+            background: #e8f0fe !important;
+            font-weight: bold;
+        }
+
+        /* Main */
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 {
+            font-size: 28px;
+        }
+
+        .page-title p {
+            color: #777;
+            margin-top: 8px;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #667eea;
+        }
+
+        .add-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .add-btn:hover {
+            background: #5568d9;
+        }
+
+        .message {
+            display: none;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Back button */
+        .back-btn {
+            margin-top: 20px;
+            border: none;
+            background: transparent;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div>
+            <h1>💰 Expense Tracker</h1>
+            <p>Manage your money smartly</p>
+        </div>
+
+        <button class="bell" onclick="showNotifications()">🔔</button>
+    </header>
+
+
+    <nav>
+
+        <button onclick="goHome()">
+            🏠 Home
+        </button>
+
+        <button class="active">
+            ➕ Add
+        </button>
+
+        <button onclick="goReports()">
+            📊 Reports
+        </button>
+
+        <button onclick="goExpenses()">
+            🧾 Expenses
+        </button>
+
+        <button onclick="goSettings()">
+            ⚙️ Settings
+        </button>
+
+    </nav>
+
+
+    <div class="container">
+
+        <div class="page-title">
+
+            <h2>➕ Add New Expense</h2>
+
+            <p>
+                Record your spending and keep track of your money.
+            </p>
+
+        </div>
+
+
+        <div id="message" class="message"></div>
+
+
+        <div class="form-card">
+
+            <form id="expenseForm">
+
+                <div class="form-group">
+
+                    <label for="title">
+                        Expense Title
+                    </label>
+
+                    <input type="text" id="title" placeholder="Example: Lunch, Auto fare, Face wash" required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="amount">
+                        Amount (₹)
+                    </label>
+
+                    <input type="number" id="amount" placeholder="Enter amount" min="1" step="0.01" required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="date">
+                        Date
+                    </label>
+
+                    <input type="date" id="date" required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="category">
+                        Category
+                    </label>
+
+                    <select id="category" required>
+
+                        <option value="">
+                            Select Category
+                        </option>
+
+                        <option value="Food">
+                            🍔 Food
+                        </option>
+
+                        <!-- NEW BILLS CATEGORY -->
+
+                        <option value="Bills">
+                            🧾 Bills
+                        </option>
+
+                        <option value="Travel">
+                            🚕 Travel
+                        </option>
+
+                        <option value="Shopping">
+                            🛍️ Shopping
+                        </option>
+
+                        <option value="Skincare">
+                            🧴 Skincare
+                        </option>
+
+                        <option value="Stationery">
+                            📚 Stationery
+                        </option>
+
+                        <option value="Other">
+                            📦 Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button type="submit" class="add-btn">
+                    ➕ Add Expense
+                </button>
+
+            </form>
+
+
+            <button class="back-btn" onclick="goHome()">
+                ← Back to Dashboard
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const API_URL = "/api/expenses";
+
+
+        // Set today's date automatically
+
+        document.getElementById("date").value =
+            new Date().toISOString().split("T")[0];
+
+
+        // Add Expense
+
+        document
+            .getElementById("expenseForm")
+            .addEventListener("submit", async function (event) {
+
+                event.preventDefault();
+
+
+                const title =
+                    document.getElementById("title").value.trim();
+
+                const amount =
+                    parseFloat(
+                        document.getElementById("amount").value
+                    );
+
+                const date =
+                    document.getElementById("date").value;
+
+                const category =
+                    document.getElementById("category").value;
+
+
+                if (!title || !amount || !date || !category) {
+
+                    showMessage(
+                        "Please fill all the fields.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                try {
+
+                    const response = await fetch(API_URL, {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            title: title,
+
+                            amount: amount,
+
+                            date: date,
+
+                            category: category
+
+                        })
+
+                    });
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            "Failed to add expense"
+                        );
+
+                    }
+
+
+                    showMessage(
+                        "✅ Expense added successfully!",
+                        "success"
+                    );
+
+
+                    document
+                        .getElementById("expenseForm")
+                        .reset();
+
+
+                    // Put today's date again
+
+                    document.getElementById("date").value =
+                        new Date().toISOString().split("T")[0];
+
+
+                    // Go back to Home after 1 second
+
+                    setTimeout(function () {
+
+                        window.location.href =
+                            "index.html";
+
+                    }, 1000);
+
+
+                } catch (error) {
+
+                    console.error(error);
+
+
+                    showMessage(
+
+                        "❌ Something went wrong. Please check that the server is running.",
+
+                        "error"
+
+                    );
+
+                }
+
+            });
+
+
+        function showMessage(text, type) {
+
+            const message =
+                document.getElementById("message");
+
+            message.textContent = text;
+
+            message.className =
+                "message " + type;
+
+            message.style.display = "block";
+
+        }
+
+
+        function goHome() {
+
+            window.location.href =
+                "index.html";
+
+        }
+
+
+        function goReports() {
+
+            window.location.href =
+                "reports.html";
+
+        }
+
+
+        function goExpenses() {
+
+            window.location.href =
+                "expenses.html";
+
+        }
+
+
+        function goSettings() {
+
+            window.location.href =
+                "settings.html";
+
+        }
+
+
+        function showNotifications() {
+
+            alert(
+                "🔔 Notifications will be available here soon."
+            );
+
+        }
+
+    </script>
+
+</body>
+
+</html>
